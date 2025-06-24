@@ -1,0 +1,49 @@
+services:
+  pss-fs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pss-fs-app
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres-db
+      DB_USER: pc
+      DB_PASSWORD: pc4k2F1TG2HphA
+      DB_NAME: planarshare
+      DB_PORT: 5432
+      DB_SSLMODE: disable
+      DB_TIMEZONE: UTC
+      DATABASE_URL: postgresql://pc:pc4k2F1TG2HphA@postgres-db:5432/planarshare
+      PORT: 3000
+      FILES_DIRECTORY: /app/files
+      MAX_FILE_SIZE: 0
+    volumes:
+      - pss_fs_files:/app/files
+    healthcheck:
+      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:3000/']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.pss-fs.rule=Host(`fs.planarshare.com`)'
+      - 'traefik.http.routers.pss-fs.entrypoints=web,websecure'
+      - 'traefik.http.routers.pss-fs.tls.certresolver=myresolver'
+    networks:
+      - default
+
+  # db:
+  #   external: true
+  #   name: postgres-db
+
+volumes:
+  pss_fs_files:
+    driver: local
+# networks:
+#   default:
+#     external: true
+#     name: default

@@ -54,6 +54,8 @@ Thumbs.db
 *.sqlite3
 
 # Backup files
+*.bak*
+*.backup*
 *.bak
 *.backup
 
